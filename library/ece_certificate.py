@@ -85,9 +85,9 @@ def ece_certificate(data):
                         if data['chain'] is None:
                             data['chain'] = ""
                         else:
-                            data['chain'] = data['chain'].rstrip
+                            data['chain'] = data['chain'].rstrip()
                         data['key'] = data['key'].rstrip()
-                        data['cert'] = data['cert'].rstrip() + data['chain']
+                        data['cert'] = data['cert'].rstrip() + '\n' + data['chain']
 
                         files = {
                             "key": data['key'],
