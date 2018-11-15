@@ -85,16 +85,15 @@ def ece_certificate(data):
                 # if certificate and key are not found, let's upload a new one
                 else:
                     if data.has_key('key') and data.has_key('cert'):
-                        if data['chain'] is None:
-                            data['chain'] = ""
-                        else:
+                        if data['chain'] is not None:
                             data['chain'] = data['chain'].rstrip()
                         data['key'] = data['key'].rstrip()
-                        data['cert'] = data['cert'].rstrip() + '\n' + data['chain']
+                        data['cert'] = data['cert'].rstrip()
 
                         files = {
                             "key": data['key'],
-                            "cert": data['cert']
+                            "cert": data['cert'],
+                            "chain": data['chain']
                         }
                         url = "{}{}" . format(data['api_url'], '/certificate')
                         del data['api_url']
