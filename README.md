@@ -12,7 +12,7 @@ https://docs.ansible.com/ansible/latest/dev_guide/developing_locally.html#adding
 ```yml
 - hosts: localhost
   vars:
-    api_url: "https://nacp01.noraina.net"
+    api_url: "https://nacp01.noraina.net/api"
     mail: "user@example.com"
     password: "password"
   tasks:
@@ -76,7 +76,7 @@ https://docs.ansible.com/ansible/latest/dev_guide/developing_locally.html#adding
 ```yml
 - hosts: localhost
   vars:
-    api_url: "https://nacp01.noraina.net"
+    api_url: "https://nacp01.noraina.net/api"
     mail: "user@example.com"
     password: "password"
   tasks:
@@ -102,4 +102,43 @@ https://docs.ansible.com/ansible/latest/dev_guide/developing_locally.html#adding
         name: "my_old_certificate"
       register: delete
     - debug: var=delete
+```
+### Upload certificate and create an instance with a service that uses it
+```
+- hosts: localhost
+  vars:
+    api_url: "https://nacp01.noraina.net/api"
+    mail: "user@example.com"
+    password: "password"
+  tasks:
+    - name: Upload a certificate with certificate chain
+      ece_certificate:
+        api_url: "{{api_url}}"
+        mail: "{{mail}}"
+        password: "{{password}}"
+        state: "present"
+        name: "*.domain.com"
+        key: "{{ lookup('file', '/path/to/key.pem') }}"
+        cert: "{{ lookup('file', '/path/to/cert.pem') }}"
+        chain: "{{ lookup('file', '/path/to/chain.pem') }}"
+      register: upload
+    - debug: var=upload
+
+    - name: Create a new instance
+      ece_instance:
+        api_url: "{{api_url}}"
+        mail: "{{mail}}"
+        password: "{{password}}"
+        state: "present"
+        name: "my_instance"
+        services:
+          - { name: "my_service_1",
+              fqdn: "my-service-1.domain.com",
+              origin_hostheader: "my-service-1.domain.com",
+              origin_backend: "https://my-service-1-123456789.eu-west-1.elb.amazonaws.com",
+              provider_region: "eu-west-1",
+              provider_name: "aws",
+              cert_id: "{{upload.meta.data._id}}" }
+      register: create
+    - debug: var=create
 ```
