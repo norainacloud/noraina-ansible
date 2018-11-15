@@ -78,7 +78,10 @@ def ece_certificate(data):
                 (cert for cert in certificates['data'] if cert['name'] == data['name']), None)
                 # if we find a name already, just print out the certificate info.
                 if certificate is not None:
-                    return False, None, False, certificate
+                    result={}
+                    result['data']=certificate
+                    result['status']="success"
+                    return False, None, False, result
                 # if certificate and key are not found, let's upload a new one
                 else:
                     if data.has_key('key') and data.has_key('cert'):
